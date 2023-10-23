@@ -31,21 +31,34 @@
     <h2>Convertidor de Bolívares a Dólares</h2>
 
     <?php
-    // Verificar si se ha enviado el formulario
+    abstract class ConvertidorMoneda {
+        protected $tasaCambio;
+
+        public function __construct($tasaCambio) {
+            $this->tasaCambio = $tasaCambio;
+        }
+
+        abstract protected function convertir($monto);
+    }
+
+    class BolivarADolar extends ConvertidorMoneda {
+        public function __construct($tasaCambio) {
+            parent::__construct($tasaCambio);
+        }
+
+        protected function convertir($monto) {
+            return $monto * $this->tasaCambio;
+        }
+    }
+
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        // Obtener el monto ingresado por el usuario
         $monto = $_POST["ConvertidorBolivarADolar"];
-
-        // Verificar si se ingresó un valor numérico válido
         if (is_numeric($monto)) {
-            // Realizar la conversión de bolívares a dólares (considerando una tasa de cambio fija)
-            $tasaCambio = 0.029;  // Tasa de cambio: 1 bolívar = 0.00012 dólares
-            $conversion = $monto * $tasaCambio;
-
-            // Mostrar el resultado de la conversión
+            $tasaCambio = 0.00012;
+            $convertidor = new BolivarADolar($tasaCambio);
+            $conversion = $convertidor->convertir($monto);
             echo "El monto en dólares es: " . $conversion;
         } else {
-            // Mostrar un mensaje de error si el monto ingresado no es válido
             echo "Por favor, ingresa un valor numérico válido.";
         }
     }
@@ -59,3 +72,4 @@
     </form>
 </body>
 </html>
+      
