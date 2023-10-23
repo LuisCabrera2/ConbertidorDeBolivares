@@ -1,75 +1,83 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Convertidor de Bolívares a Dólares</title>
     <style>
-        input[type="text"],
-        input[type="submit"] {
-            margin-top: 8px;
-            padding: 8px;
-            width: 80%;
-            border: 1px solid #ddd;
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            max-width: 300px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
             border-radius: 4px;
+        }
+
+        h2 {
             text-align: center;
         }
 
-        input[type="submit"] {
-            margin-top: 20px;
-            padding: 10px;
+        input[type="number"] {
             width: 100%;
-            border: none;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        input[type="submit"] {
             background-color: #007BFF;
-            color: white;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
             border-radius: 4px;
             cursor: pointer;
+        }
+
+        .result {
+            margin-top: 20px;
+            text-align: center;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
-    <h2>Convertidor de Bolívares a Dólares</h2>
+    <div class="container">
+        <h2>Convertidor de Bolívares a Dólares</h2>
 
-    <?php
-    abstract class ConvertidorMoneda {
-        protected $tasaCambio;
+        <?php
+        class ConvertidorMoneda {
+            private $tasaCambio;
 
-        public function __construct($tasaCambio) {
-            $this->tasaCambio = $tasaCambio;
+            public function __construct($tasaCambio) {
+                $this->tasaCambio = $tasaCambio;
+            }
+
+            public function convertir($monto) {
+                return $monto * $this->tasaCambio;
+            }
         }
 
-        abstract protected function convertir($monto);
-    }
-
-    class BolivarADolar extends ConvertidorMoneda {
-        public function __construct($tasaCambio) {
-            parent::__construct($tasaCambio);
+        if ($_SERVER["REQUEST_METHOD"] == "POST") {
+            $monto = $_POST["monto"];
+            if (is_numeric($monto)) {
+                $tasaCambio = 0.029;
+                $convertidor = new ConvertidorMoneda($tasaCambio);
+                $conversion = $convertidor->convertir($monto);
+                echo '<div class="result">El monto en dólares es: $' . $conversion . '</div>';
+            } else {
+                echo '<div class="result">Por favor, ingresa un valor numérico válido.</div>';
+            }
         }
+        ?>
 
-        protected function convertir($monto) {
-            return $monto * $this->tasaCambio;
-        }
-    }
-
-    if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        $monto = $_POST["ConvertidorBolivarADolar"];
-        if (is_numeric($monto)) {
-            $tasaCambio = 0.00012;
-            $convertidor = new BolivarADolar($tasaCambio);
-            $conversion = $convertidor->convertir($monto);
-            echo "El monto en dólares es: " . $conversion;
-        } else {
-            echo "Por favor, ingresa un valor numérico válido.";
-        }
-    }
-    ?>
-
-    <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
-        <section>
-            <input type="text" name="ConvertidorBolivarADolar" placeholder="Introduce el Monto a Convertir">
-        </section>
-        <input type="submit" value="Convertir">
-    </form>
+        <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+            <input type="number" name="monto" placeholder="Introduce el monto en bolívares" required>
+            <input type="submit" value="Convertir">
+        </form>
+    </div>
 </body>
 </html>
-      
